@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pranira Industries Private Limited - Forklift Manufacturers & Suppliers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6, .industrial-font {
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        /* Loader Animation */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .loader-container.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .forklift-animation {
+            width: 200px;
+            height: 120px;
+            position: relative;
+            animation: drive 3s ease-in-out infinite;
+        }
+        
+        .forklift-body {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px;
+            height: 60px;
+            background: #f59e0b;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .forklift-cabin {
+            position: absolute;
+            bottom: 80px;
+            left: 30px;
+            width: 50px;
+            height: 40px;
+            background: #1e40af;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .forklift-mast {
+            position: absolute;
+            bottom: 20px;
+            left: 100px;
+            width: 8px;
+            height: 100px;
+            background: #64748b;
+            animation: lift 2s ease-in-out infinite;
+        }
+        
+        .forklift-forks {
+            position: absolute;
+            bottom: 20px;
+            left: 90px;
+            width: 40px;
+            height: 6px;
+            background: #94a3b8;
+            animation: liftForks 2s ease-in-out infinite;
+        }
+        
+        .wheel {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            height: 30px;
+            background: #1f2937;
+            border-radius: 50%;
+            border: 3px solid #4b5563;
+            animation: rotate 1s linear infinite;
+        }
+        
+        .wheel-front { left: 30px; }
+        .wheel-back { left: 100px; }
+        
+        @keyframes drive {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+        
+        @keyframes lift {
+            0%, 100% { height: 100px; }
+            50% { height: 140px; }
+        }
+        
+        @keyframes liftForks {
+            0%, 100% { bottom: 20px; }
+            50% { bottom: 60px; }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #fbbf24;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 30px;
+            letter-spacing: 2px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Industrial Theme Colors */
+        .bg-industrial-dark { background-color: #0f172a; }
+        .bg-industrial-blue { background-color: #1e40af; }
+        .bg-industrial-orange { background-color: #f59e0b; }
+        .text-industrial-orange { color: #f59e0b; }
+        .border-industrial-orange { border-color: #f59e0b; }
+        
+        /* Product Card Hover Effects */
+        .product-card {
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #f59e0b;
+        }
+        
+        /* Image Slider */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .slider-image {
+            min-width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        /* Admin Panel Styles */
+        .admin-sidebar {
+            background: #1e293b;
+            min-height: 100vh;
+        }
+        
+        .admin-content {
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #f59e0b;
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Language Switcher */
+        .lang-switch {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .lang-switch:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* Ticket Status */
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-progress { background: #dbeafe; color: #1e40af; }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 5px;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 999;
+            padding-top: 80px;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Loading Animation -->
+    <div class="loader-container" id="loader">
+        <div class="forklift-animation">
+            <div class="forklift-cabin"></div>
+            <div class="forklift-body"></div>
+            <div class="forklift-mast"></div>
+            <div class="forklift-forks"></div>
+            <div class="wheel wheel-front"></div>
+            <div class="wheel wheel-back"></div>
+        </div>
+        <div class="loading-text">PRANIRA INDUSTRIES</div>
+        <div class="text-white mt-2 text-sm">Loading Heavy Equipment Solutions...</div>
+    </div>
+
+    <!-- Main Website -->
+    <div id="mainWebsite">
+        <!-- Header -->
+        <header class="bg-industrial-dark text-white sticky top-0 z-50 shadow-lg">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+                        <div class="w-12 h-12 bg-industrial-orange rounded-lg flex items-center justify-center">
+                            <i class="fas fa-truck-loading text-2xl text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-white leading-none">PRANIRA</h1>
+                            <p class="text-xs text-gray-400">Industries Pvt. Ltd.</p>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <nav class="desktop-nav hidden md:flex items-center space-x-8">
+                        <a href="#" onclick="showSection('home')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Home" data-hi="होम">Home</a>
+                        <a href="#" onclick="showSection('products')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Products" data-hi="उत्पाद">Products</a>
+                        <a href="#" onclick="showSection('gallery')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Gallery" data-hi="गैलरी">Gallery</a>
+                        <a href="#" onclick="showSection('videos')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Videos" data-hi="वीडियो">Videos</a>
+                        <a href="#" onclick="showSection('about')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="About" data-hi="हमारे बारे में">About</a>
+                        <a href="#" onclick="showSection('contact')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Contact" data-hi="संपर्क">Contact</a>
+                        <a href="#" onclick="showSection('enquiry')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Enquiry" data-hi="पूछताछ">Enquiry</a>
+                        <a href="#" onclick="showSection('service')" class="nav-link text-sm font-medium hover:text-industrial-orange" data-en="Service Request" data-hi="सेवा अनुरोध">Service Request</a>
+                    </nav>
+
+                    <!-- Language Switcher & Admin -->
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2 bg-gray-800 rounded-lg p-1">
+                            <button onclick="changeLanguage('en')" class="lang-switch text-xs font-bold px-2 py-1 rounded bg-industrial-orange text-white" id="btn-en">EN</button>
+                            <button onclick="changeLanguage('hi')" class="lang-switch text-xs font-bold px-2 py-1 rounded text-gray-400 hover:text-white" id="btn-hi">HI</button>
+                        </div>
+                        <button onclick="showAdminLogin()" class="bg-industrial-orange hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                            <i class="fas fa-lock mr-2"></i><span data-en="Admin" data-hi="एडमिन">Admin</span>
+                        </button>
+                        <button class="mobile-menu-btn md:hidden text-2xl" onclick="toggleMobileMenu()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="container mx-auto px-4">
+                <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 text-3xl text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="flex flex-col space-y-6 text-center">
+                    <a href="#" onclick="showSection('home'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Home</a>
+                    <a href="#" onclick="showSection('products'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Products</a>
+                    <a href="#" onclick="showSection('gallery'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Gallery</a>
+                    <a href="#" onclick="showSection('videos'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Videos</a>
+                    <a href="#" onclick="showSection('about'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">About</a>
+                    <a href="#" onclick="showSection('contact'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Contact</a>
+                    <a href="#" onclick="showSection('enquiry'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Enquiry</a>
+                    <a href="#" onclick="showSection('service'); toggleMobileMenu()" class="text-2xl font-bold text-white hover:text-industrial-orange">Service Request</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sections -->
+        
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <!-- Hero -->
+            <div class="relative h-[600px] overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-industrial-dark/90 to-transparent z-10"></div>
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200" alt="Forklift" class="w-full h-full object-cover">
+                <div class="absolute inset-0 z-20 flex items-center">
+                    <div class="container mx-auto px-4">
+                        <div class="max-w-2xl">
+                            <div class="inline-block bg-industrial-orange text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+                                <span data-en="Established 2023" data-hi="स्थापना 2023">Established 2023</span>
+                            </div>
+                            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                                <span data-en="Forklift Truck" data-hi="फोर्कलिफ्ट ट्रक">Forklift Truck</span><br>
+                                <span class="text-industrial-orange" data-en="Manufacturers & Suppliers" data-hi="निर्माता और आपूर्तिकर्ता">Manufacturers & Suppliers</span>
+                            </h1>
+                            <p class="text-xl text-gray-300 mb-8" data-en="Authorized Dealer for ACE Material Handling Equipment. Premium quality forklifts, stackers, and warehouse solutions at best prices." data-hi="ACE मटेरियल हैंडलिंग इक्विपमेंट के लिए अधिकृत डीलर। उच्च गुणवत्ता वाले फोर्कलिफ्ट, स्टैकर और वेयरहाउस समाधान सर्वोत्तम मूल्य पर।">
+                                Authorized Dealer for ACE Material Handling Equipment. Premium quality forklifts, stackers, and warehouse solutions at best prices.
+                            </p>
+                            <div class="flex flex-wrap gap-4">
+                                <button onclick="showSection('products')" class="bg-industrial-orange hover:bg-yellow-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105">
+                                    <span data-en="View Products" data-hi="उत्पाद देखें">View Products</span>
+                                </button>
+                                <button onclick="showSection('enquiry')" class="border-2 border-white text-white hover:bg-white hover:text-industrial-dark px-8 py-4 rounded-lg font-bold text-lg transition">
+                                    <span data-en="Get Quote" data-hi="कोट प्राप्त करें">Get Quote</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="bg-industrial-blue py-12">
+                <div class="container mx-auto px-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+                        <div>
+                            <div class="text-4xl font-bold text-industrial-orange mb-2">20+</div>
+                            <div class="text-sm" data-en="Service Engineers" data-hi="सर्विस इंजीनियर">Service Engineers</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-industrial-orange mb-2">23+</div>
+                            <div class="text-sm" data-en="Product Categories" data-hi="उत्पाद श्रेणियां">Product Categories</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-industrial-orange mb-2">2</div>
+                            <div class="text-sm" data-en="Service Centers" data-hi="सेवा केंद्र">Service Centers</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-industrial-orange mb-2">100%</div>
+                            <div class="text-sm" data-en="Quality Assured" data-hi="गुणवत्ता आश्वासन">Quality Assured</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="py-16 bg-gray-50">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-industrial-dark">
+                        <span data-en="Featured Equipment" data-hi="विशेष उपकरण">Featured Equipment</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="featuredProducts">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Choose Us -->
+            <div class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-4xl font-bold text-center mb-12 text-industrial-dark">
+                        <span data-en="Why Choose Pranira?" data-hi="प्रनिरा क्यों चुनें?">Why Choose Pranira?</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-xl transition">
+                            <div class="w-16 h-16 bg-industrial-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-certificate text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2" data-en="Authorized Dealer" data-hi="अधिकृत डीलर">Authorized Dealer</h3>
+                            <p class="text-gray-600" data-en="Official dealer for ACE, Microtex Batteries, and Cotton Greaves Generators" data-hi="ACE, माइक्रोटेक्स बैटरी और कॉटन ग्रीव्स जनरेटर के लिए आधिकारिक डीलर">Official dealer for ACE, Microtex Batteries, and Cotton Greaves Generators</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-xl transition">
+                            <div class="w-16 h-16 bg-industrial-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-tools text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2" data-en="Expert Service Team" data-hi="विशेषज्ञ सेवा टीम">Expert Service Team</h3>
+                            <p class="text-gray-600" data-en="20+ trained service engineers across Pune, Jalgaon, Dhule & Nandurbar" data-hi="पुणे, जलगांव, धुले और नंदुरबार में 20+ प्रशिक्षित सेवा इंजीनियर">20+ trained service engineers across Pune, Jalgaon, Dhule & Nandurbar</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-xl text-center hover:shadow-xl transition">
+                            <div class="w-16 h-16 bg-industrial-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-headset text-2xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2" data-en="24/7 Support" data-hi="24/7 समर्थन">24/7 Support</h3>
+                            <p class="text-gray-600" data-en="WhatsApp integration and dedicated customer support for all queries" data-hi="सभी प्रश्नों के लिए व्हाट्सएप एकीकरण और समर्पित ग्राहक सहायता">WhatsApp integration and dedicated customer support for all queries</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Our Products" data-hi="हमारे उत्पाद">Our Products</span>
+                    </h1>
+                    <p class="text-gray-400" data-en="Complete range of material handling equipment" data-hi="मटेरियल हैंडलिंग उपकरण की पूरी रेंज">Complete range of material handling equipment</p>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-4 py-12">
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-4 mb-8 justify-center">
+                    <button onclick="filterProducts('all')" class="px-6 py-2 bg-industrial-orange text-white rounded-full font-medium hover:bg-yellow-600 transition">All</button>
+                    <button onclick="filterProducts('forklift')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition">Forklifts</button>
+                    <button onclick="filterProducts('stacker')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition">Stackers</button>
+                    <button onclick="filterProducts('pallet')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition">Pallet Trucks</button>
+                    <button onclick="filterProducts('other')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition">Others</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="productsGrid">
+                    <!-- Products loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Detail Modal -->
+        <div id="productModal" class="modal">
+            <div class="modal-content w-full max-w-4xl m-4">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="p-4 bg-gray-100">
+                        <div class="slider-container rounded-lg overflow-hidden mb-4" id="productImageSlider">
+                            <div class="slider-track" id="sliderTrack">
+                                <!-- Images -->
+                            </div>
+                            <button onclick="prevSlide()" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white"><i class="fas fa-chevron-left"></i></button>
+                            <button onclick="nextSlide()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="flex gap-2" id="thumbnailContainer">
+                            <!-- Thumbnails -->
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+                        <h2 id="modalProductName" class="text-3xl font-bold text-industrial-dark mb-4"></h2>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span id="modalProductPrice" class="text-2xl font-bold text-industrial-orange"></span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">In Stock</span>
+                        </div>
+                        <p id="modalProductDesc" class="text-gray-600 mb-6 leading-relaxed"></p>
+                        
+                        <div class="border-t pt-6">
+                            <h4 class="font-bold mb-3">Specifications:</h4>
+                            <ul id="modalProductSpecs" class="space-y-2 text-sm text-gray-600">
+                                <!-- Specs -->
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-8 flex gap-4">
+                            <button onclick="enquiryForProduct()" class="flex-1 bg-industrial-orange text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                                <i class="fab fa-whatsapp mr-2"></i>Enquire Now
+                            </button>
+                            <button onclick="closeProductModal()" class="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Product Gallery" data-hi="उत्पाद गैलरी">Product Gallery</span>
+                    </h1>
+                </div>
+            </div>
+            <div class="container mx-auto px-4 py-12">
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Gallery images loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Gallery Section -->
+        <section id="videos" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Video Gallery" data-hi="वीडियो गैलरी">Video Gallery</span>
+                    </h1>
+                </div>
+            </div>
+            <div class="container mx-auto px-4 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="videoGrid">
+                    <!-- Videos loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="About Us" data-hi="हमारे बारे में">About Us</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-4 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800" alt="Factory" class="rounded-xl shadow-2xl w-full">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-industrial-dark mb-6">Pranira Industries Private Limited</h2>
+                        <p class="text-gray-600 mb-4 leading-relaxed">
+                            Established in the year 2023, Pranira Industries Private Limited is the leading Wholesaler, Trader, and Service Provider of ACE Forklift and many other industrial equipment items.
+                        </p>
+                        <p class="text-gray-600 mb-4 leading-relaxed">
+                            We are the Authorised Dealer for Action Construction Equipment (ACE) for Material Handling Equipment, Microtex Battery in Pune, Jalgaon, Dhule & Nandurbar, and Cotton Greaves Limited Make Diesel Generator in Jalgaon, Dhule & Nandurbar.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-industrial-orange font-bold text-lg">CEO</div>
+                                <div class="text-gray-700">Pravin Raut</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-industrial-orange font-bold text-lg">GST No.</div>
+                                <div class="text-gray-700 text-sm">27AANCP8600P1ZP</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-industrial-orange font-bold text-lg">CIN No.</div>
+                                <div class="text-gray-700 text-sm">U32909PN2023PTC221514</div>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-industrial-orange font-bold text-lg">Established</div>
+                                <div class="text-gray-700">2023</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Locations -->
+                <div class="bg-gray-50 rounded-2xl p-8 mb-16">
+                    <h3 class="text-2xl font-bold text-center mb-8 text-industrial-dark">Our Locations</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-full flex items-center justify-center text-white mr-4">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Pune Office</h4>
+                                    <p class="text-gray-600 text-sm">Headquarters & Service Center</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">Gat No 182, Alandi-Markal Rd, opp. Polybond, Dhanore, Pune, Maharashtra 412105</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-full flex items-center justify-center text-white mr-4">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Jalgaon Office</h4>
+                                    <p class="text-gray-600 text-sm">Service Center</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600">Jalgaon, Maharashtra (Service Center Location)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product List -->
+                <div class="mb-16">
+                    <h3 class="text-2xl font-bold text-center mb-8 text-industrial-dark">Our Product Range</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Hand/Electrical Pallet Truck (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> SS Hand Pallet (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Manual/Semi Electrical Stacker (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Electrical Stacker (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Power Pallet Truck (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Counterbalanced Electrical Stacker (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Dock Leveller (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Mobile Dock Ramp (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Boom Lift (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Articulated Forklift (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Aerial Work Platform (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Reach Truck (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Diesel Forklift 1.5T to 16T (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Electrical Forklift 1.5T to 6T (ACE)
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-industrial-orange">
+                            <i class="fas fa-check-circle text-industrial-orange mr-2"></i> Customized Conveyors
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Contact Us" data-hi="संपर्क करें">Contact Us</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-4 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-industrial-dark">Get in Touch</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-lg flex items-center justify-center text-white mr-4 flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Address</h4>
+                                    <p class="text-gray-600">Gat No 182, Alandi-Markal Rd, opp. Polybond, Dhanore, Pune, Maharashtra 412105</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-lg flex items-center justify-center text-white mr-4 flex-shrink-0">
+                                    <i class="fas fa-phone text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Phone</h4>
+                                    <p class="text-gray-600">+91-97642-40737</p>
+                                    <p class="text-gray-600">+91-9028287014</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-lg flex items-center justify-center text-white mr-4 flex-shrink-0">
+                                    <i class="fab fa-whatsapp text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">WhatsApp</h4>
+                                    <p class="text-gray-600">+91-9028287014</p>
+                                    <a href="https://wa.me/919028287014" target="_blank" class="inline-block mt-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition">
+                                        <i class="fab fa-whatsapp mr-2"></i>Chat on WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-industrial-orange rounded-lg flex items-center justify-center text-white mr-4 flex-shrink-0">
+                                    <i class="fas fa-envelope text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Email</h4>
+                                    <p class="text-gray-600">sales@pranira.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Map -->
+                        <div class="mt-8 rounded-xl overflow-hidden shadow-lg">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.1234567890123!2d73.9!3d18.6!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDM2JzAwLjAiTiA3M8KwNTQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1234567890" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-industrial-dark">Send us a Message</h3>
+                        <form id="contactForm" class="bg-white p-8 rounded-xl shadow-lg">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Name</label>
+                                <input type="text" id="contactName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" id="contactEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Phone</label>
+                                <input type="tel" id="contactPhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Message</label>
+                                <textarea id="contactMessage" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-industrial-orange text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Enquiry Section -->
+        <section id="enquiry" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Product Enquiry" data-hi="उत्पाद पूछताछ">Product Enquiry</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-4 py-12 max-w-4xl">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <form id="enquiryForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Full Name *</label>
+                                <input type="text" id="enqName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Company Name</label>
+                                <input type="text" id="enqCompany" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Email *</label>
+                                <input type="email" id="enqEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Phone *</label>
+                                <input type="tel" id="enqPhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Product Interested In</label>
+                            <select id="enqProduct" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange">
+                                <option value="">Select a Product</option>
+                                <option value="Diesel Forklift">Diesel Forklift</option>
+                                <option value="Electric Forklift">Electric Forklift</option>
+                                <option value="Pallet Truck">Pallet Truck</option>
+                                <option value="Stacker">Stacker</option>
+                                <option value="Reach Truck">Reach Truck</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Requirements</label>
+                            <textarea id="enqMessage" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="Please describe your requirements..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-industrial-orange text-white py-4 rounded-lg font-bold text-lg hover:bg-yellow-600 transition transform hover:scale-[1.02]">
+                            <i class="fab fa-whatsapp mr-2"></i>Send Enquiry via WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Request Section -->
+        <section id="service" class="section hidden">
+            <div class="bg-industrial-dark py-12">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        <span data-en="Service Request / Complaint" data-hi="सेवा अनुरोध / शिकायत">Service Request / Complaint</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-4 py-12 max-w-4xl">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-sm text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Raise a ticket for service requests or complaints. Our team will respond via WhatsApp within 24 hours.
+                        </p>
+                    </div>
+                    
+                    <form id="serviceForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Customer Name *</label>
+                                <input type="text" id="svcName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Phone *</label>
+                                <input type="tel" id="svcPhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Equipment Model</label>
+                                <input type="text" id="svcModel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="e.g., ACE AF 30D">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Serial Number</label>
+                                <input type="text" id="svcSerial" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Type *</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="svcType" value="service" class="mr-2 text-industrial-orange" checked>
+                                    <span>Service Request</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="svcType" value="complaint" class="mr-2 text-industrial-orange">
+                                    <span>Complaint</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Issue Description *</label>
+                            <textarea id="svcIssue" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="Describe the issue in detail..." required></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Preferred Service Date</label>
+                            <input type="date" id="svcDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange">
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition transform hover:scale-[1.02]">
+                            <i class="fas fa-ticket-alt mr-2"></i>Raise Ticket
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-industrial-dark text-white py-12 mt-12">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 bg-industrial-orange rounded-lg flex items-center justify-center">
+                                <i class="fas fa-truck-loading text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">PRANIRA</h3>
+                                <p class="text-xs text-gray-400">Industries Pvt. Ltd.</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-4">Leading wholesaler and authorized dealer for ACE Material Handling Equipment.</p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-industrial-orange transition"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-industrial-orange transition"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-industrial-orange transition"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 text-industrial-orange">Quick Links</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="#" onclick="showSection('home')" class="hover:text-white transition">Home</a></li>
+                            <li><a href="#" onclick="showSection('products')" class="hover:text-white transition">Products</a></li>
+                            <li><a href="#" onclick="showSection('about')" class="hover:text-white transition">About Us</a></li>
+                            <li><a href="#" onclick="showSection('contact')" class="hover:text-white transition">Contact</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 text-industrial-orange">Products</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="#" onclick="showSection('products')" class="hover:text-white transition">Diesel Forklifts</a></li>
+                            <li><a href="#" onclick="showSection('products')" class="hover:text-white transition">Electric Forklifts</a></li>
+                            <li><a href="#" onclick="showSection('products')" class="hover:text-white transition">Pallet Trucks</a></li>
+                            <li><a href="#" onclick="showSection('products')" class="hover:text-white transition">Stackers</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-bold mb-4 text-industrial-orange">Contact</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><i class="fas fa-map-marker-alt mr-2"></i>Pune, Maharashtra</li>
+                            <li><i class="fas fa-phone mr-2"></i>+91-9028287014</li>
+                            <li><i class="fas fa-envelope mr-2"></i>sales@pranira.com</li>
+                            <li><i class="fab fa-whatsapp mr-2"></i>+91-9028287014</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+                    <p>&copy; 2024 Pranira Industries Private Limited. All rights reserved.</p>
+                    <p class="mt-2">Designed & Developed by <span class="text-industrial-orange">Matrix Technologies</span></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <!-- Admin Login -->
+        <div id="adminLogin" class="min-h-screen bg-industrial-dark flex items-center justify-center">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-industrial-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-2xl text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-industrial-dark">Admin Login</h2>
+                    <p class="text-gray-600 text-sm">Pranira Industries Management System</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Username</label>
+                        <input type="text" id="adminUser" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" value="admin">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Password</label>
+                        <input type="password" id="adminPass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" value="admin">
+                    </div>
+                    <div id="loginError" class="text-red-600 text-sm hidden">Invalid credentials!</div>
+                    <button type="submit" class="w-full bg-industrial-orange text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                        Login
+                    </button>
+                </form>
+                
+                <button onclick="backToWebsite()" class="w-full mt-4 text-gray-600 hover:text-industrial-orange transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Website
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="flex">
+                <!-- Sidebar -->
+                <div class="w-64 admin-sidebar text-white p-6 fixed h-full overflow-y-auto">
+                    <div class="mb-8">
+                        <h2 class="text-xl font-bold text-industrial-orange">ADMIN PANEL</h2>
+                        <p class="text-xs text-gray-400 mt-1">Pranira Industries</p>
+                    </div>
+                    
+                    <nav class="space-y-2">
+                        <button onclick="showAdminSection('dashboard')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-tachometer-alt mr-3 w-5"></i>Dashboard
+                        </button>
+                        <button onclick="showAdminSection('products')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-boxes mr-3 w-5"></i>Manage Products
+                        </button>
+                        <button onclick="showAdminSection('gallery')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-images mr-3 w-5"></i>Image Gallery
+                        </button>
+                        <button onclick="showAdminSection('videos')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-video mr-3 w-5"></i>Video Gallery
+                        </button>
+                        <button onclick="showAdminSection('enquiries')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-clipboard-list mr-3 w-5"></i>Enquiries
+                        </button>
+                        <button onclick="showAdminSection('tickets')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-ticket-alt mr-3 w-5"></i>Service Tickets
+                        </button>
+                        <button onclick="showAdminSection('settings')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-cog mr-3 w-5"></i>Settings
+                        </button>
+                        <button onclick="adminLogout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-red-600 transition flex items-center text-red-400 hover:text-white mt-8">
+                            <i class="fas fa-sign-out-alt mr-3 w-5"></i>Logout
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Content -->
+                <div class="ml-64 flex-1 admin-content p-8">
+                    <!-- Dashboard -->
+                    <div id="admin-dashboard" class="admin-section">
+                        <h2 class="text-3xl font-bold text-industrial-dark mb-8">Dashboard</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-600 text-sm">Total Products</p>
+                                        <p class="text-3xl font-bold text-industrial-dark" id="dashProductCount">0</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                                        <i class="fas fa-boxes text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-600 text-sm">Total Enquiries</p>
+                                        <p class="text-3xl font-bold text-industrial-dark" id="dashEnquiryCount">0</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                        <i class="fas fa-clipboard-list text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-600 text-sm">Open Tickets</p>
+                                        <p class="text-3xl font-bold text-industrial-dark" id="dashTicketCount">0</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                                        <i class="fas fa-ticket-alt text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-gray-600 text-sm">Gallery Images</p>
+                                        <p class="text-3xl font-bold text-industrial-dark" id="dashGalleryCount">0</p>
+                                    </div>
+                                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                                        <i class="fas fa-images text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h3 class="text-lg font-bold mb-4">Recent Enquiries</h3>
+                                <div id="recentEnquiries" class="space-y-3">
+                                    <!-- Dynamic content -->
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h3 class="text-lg font-bold mb-4">Recent Tickets</h3>
+                                <div id="recentTickets" class="space-y-3">
+                                    <!-- Dynamic content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Products -->
+                    <div id="admin-products" class="admin-section hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-industrial-dark">Manage Products</h2>
+                            <button onclick="openProductModal()" class="bg-industrial-orange text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                                <i class="fas fa-plus mr-2"></i>Add Product
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Image</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Category</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Price</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminProductsTable" class="divide-y divide-gray-200">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Product Modal -->
+                    <div id="productEditModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+                        <div class="bg-white rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+                            <h3 class="text-2xl font-bold mb-6" id="productModalTitle">Add Product</h3>
+                            <form id="productForm" class="space-y-4">
+                                <input type="hidden" id="editProductId">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Product Name *</label>
+                                    <input type="text" id="prodName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Category *</label>
+                                        <select id="prodCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                            <option value="forklift">Forklift</option>
+                                            <option value="stacker">Stacker</option>
+                                            <option value="pallet">Pallet Truck</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 font-medium mb-2">Price</label>
+                                        <input type="text" id="prodPrice" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="e.g., ₹4,50,000">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Description</label>
+                                    <textarea id="prodDesc" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Specifications (one per line)</label>
+                                    <textarea id="prodSpecs" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="Capacity: 3 Ton&#10;Lift Height: 3000mm&#10;Fuel: Diesel"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Product Images (Max 4)</label>
+                                    <div class="grid grid-cols-4 gap-4 mb-2" id="imagePreviewContainer">
+                                        <!-- Image previews -->
+                                    </div>
+                                    <input type="file" id="prodImages" accept="image/*" multiple class="w-full px-4 py-3 border border-gray-300 rounded-lg" onchange="handleImagePreview(this)">
+                                    <p class="text-xs text-gray-500 mt-1">Select up to 4 images. First image will be main image.</p>
+                                </div>
+                                <div class="flex gap-4 pt-4">
+                                    <button type="submit" class="flex-1 bg-industrial-orange text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">Save Product</button>
+                                    <button type="button" onclick="closeProductEditModal()" class="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Image Gallery Admin -->
+                    <div id="admin-gallery" class="admin-section hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-industrial-dark">Image Gallery</h2>
+                            <div class="flex gap-4">
+                                <input type="file" id="galleryUpload" accept="image/*" multiple class="hidden" onchange="uploadGalleryImages(this)">
+                                button onclick="document.getElementById('galleryUpload').click()" class="bg-industrial-orange text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                                    <i class="fas fa-upload mr-2"></i>Upload Images
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="adminGalleryGrid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+
+                    <!-- Video Gallery Admin -->
+                    <div id="admin-videos" class="admin-section hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-industrial-dark">Video Gallery</h2>
+                            <button onclick="openVideoModal()" class="bg-industrial-orange text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                                <i class="fas fa-plus mr-2"></i>Add Video
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="adminVideoGrid">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+
+                    <!-- Add Video Modal -->
+                    <div id="videoModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+                        <div class="bg-white rounded-2xl p-8 w-full max-w-lg m-4">
+                            <h3 class="text-2xl font-bold mb-6">Add Video</h3>
+                            <form id="videoForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Video Title</label>
+                                    <input type="text" id="videoTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">YouTube Video ID or URL</label>
+                                    <input type="text" id="videoUrl" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" placeholder="e.g., dQw4w9WgXcQ or full URL" required>
+                                </div>
+                                <div class="flex gap-4 pt-4">
+                                    <button type="submit" class="flex-1 bg-industrial-orange text-white py-3 rounded-lg font-bold hover:bg-yellow-600 transition">Add Video</button>
+                                    <button type="button" onclick="closeVideoModal()" class="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Enquiries -->
+                    <div id="admin-enquiries" class="admin-section hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-industrial-dark">Customer Enquiries</h2>
+                            <div class="flex gap-2">
+                                <button onclick="downloadEnquiriesExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-file-excel mr-2"></i>Excel
+                                </button>
+                                <button onclick="downloadEnquiriesPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                                    <i class="fas fa-file-pdf mr-2"></i>PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Date</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Phone</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Product</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="enquiriesTable" class="divide-y divide-gray-200">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tickets -->
+                    <div id="admin-tickets" class="admin-section hidden">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-3xl font-bold text-industrial-dark">Service Tickets</h2>
+                            <div class="flex gap-2">
+                                <button onclick="downloadTicketsExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-file-excel mr-2"></i>Excel
+                                </button>
+                                <button onclick="downloadTicketsPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                                    <i class="fas fa-file-pdf mr-2"></i>PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Ticket #</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Date</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Customer</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Type</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Status</th>
+                                        <th class="px-6 py-4 text-left text-sm font-medium text-gray-600">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ticketsTable" class="divide-y divide-gray-200">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div id="admin-settings" class="admin-section hidden">
+                        <h2 class="text-3xl font-bold text-industrial-dark mb-8">Settings</h2>
+                        
+                        <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl">
+                            <h3 class="text-xl font-bold mb-6">Change Password</h3>
+                            <form id="passwordForm" class="space-y-4 mb-8">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Current Password</label>
+                                    <input type="password" id="currentPass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">New Password</label>
+                                    <input type="password" id="newPass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Confirm New Password</label>
+                                    <input type="password" id="confirmPass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-industrial-orange" required>
+                                </div>
+                                <button type="submit" class="bg-industrial-orange text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">Update Password</button>
+                            </form>
+
+                            <h3 class="text-xl font-bold mb-6 pt-8 border-t">Change Logo</h3>
+                            <div class="flex items-center gap-4">
+                                <div id="currentLogo" class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-truck-loading text-4xl text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <input type="file" id="logoUpload" accept="image/*" class="mb-2" onchange="previewLogo(this)">
+                                    <p class="text-sm text-gray-500">Recommended size: 200x200px</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hosting Guide Modal -->
+    <div id="hostingGuide" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-4xl m-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-industrial-dark">Complete Hosting & Database Guide</h2>
+                <button onclick="document.getElementById('hostingGuide').classList.remove('active'); document.getElementById('hostingGuide').classList.add('hidden'); document.getElementById('hostingGuide').style.display='none';" class="text-2xl text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="prose max-w-none space-y-6">
+                <div class="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
+                    <h3 class="text-xl font-bold text-blue-800 mb-2">Overview</h3>
+                    <p>This website uses <strong>IndexedDB</strong> (browser-based database) for data storage. No external database server required! However, for production hosting, we recommend setting up a proper backend.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-industrial-dark">Option 1: Static Hosting (Current - No Database Server Needed)</h3>
+                    <div class="bg-gray-50 p-6 rounded-xl">
+                        <h4 class="font-bold mb-2">How it works:</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                            <li>Data stores in browser's IndexedDB (local storage)</li>
+                            <li>Each device has its own separate database</li>
+                            <li>Data persists until browser cache is cleared</li>
+                            <li>Perfect for single-admin usage</li>
+                        </ul>
+                        
+                        <h4 class="font-bold mb-2 mt-4">Steps to Host:</h4>
+                        <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                            <li>Save this HTML file as <code>index.html</code></li>
+                            <li>Upload to any static hosting: GitHub Pages, Netlify, Vercel, or GoDaddy/Hostinger</li>
+                            <li>For GoDaddy: Upload to <code>public_html</code> folder via File Manager</li>
+                            <li>For Hostinger: Use hPanel File Manager or FTP</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-industrial-dark">Option 2: Full Database Setup (Recommended for Multi-user)</h3>
+                    
+                    <div class="bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-500">
+                        <h4 class="font-bold text-yellow-800 mb-2">Recommended Stack:</h4>
+                        <p><strong>PHP + MySQL</strong> (Works on both GoDaddy & Hostinger)</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold">Step-by-Step Implementation:</h4>
+                        
+                        <div class="border rounded-xl p-6">
+                            <h5 class="font-bold text-industrial-orange mb-2">1. Database Schema (MySQL)</h5>
+                            <pre class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm"><code>-- Create Database
+CREATE DATABASE pranira_industries;
+USE pranira_industries;
+
+-- Products Table
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    price VARCHAR(100),
+    description TEXT,
+    specifications TEXT,
+    images JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Enquiries Table
+CREATE TABLE enquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    company VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    product VARCHAR(100),
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tickets Table
+CREATE TABLE tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_number VARCHAR(20) UNIQUE,
+    customer_name VARCHAR(255),
+    phone VARCHAR(20),
+    equipment_model VARCHAR(100),
+    serial_number VARCHAR(100),
+    type ENUM('service', 'complaint'),
+    issue_description TEXT,
+    preferred_date DATE,
+    status ENUM('pending', 'in-progress', 'resolved') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Admin Table
+CREATE TABLE admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    password VARCHAR(255),
+    logo_path VARCHAR(255)
+);</code></pre>
+                        </div>
+
+                        <div class="border rounded-xl p-6">
+                            <h5 class="font-bold text-industrial-orange mb-2">2. Database Connection (PHP)</h5>
+                            <pre class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;?php
+// config.php
+$host = 'localhost';
+$dbname = 'pranira_industries';
+$username = 'your_db_username';
+$password = 'your_db_password';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+?&gt;</code></pre>
+                        </div>
+
+                        <div class="border rounded-xl p-6">
+                            <h5 class="font-bold text-industrial-orange mb-2">3. GoDaddy Hosting Setup</h5>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>Login to GoDaddy cPanel</li>
+                                <li>Go to <strong>MySQL Database Wizard</strong></li>
+                                <li>Create database: <code>pranira_industries</code></li>
+                                <li>Create user and assign all privileges</li>
+                                <li>Use phpMyAdmin to import the SQL schema above</li>
+                                <li>Upload PHP files to <code>public_html</code> using File Manager or FTP</li>
+                            </ul>
+                        </div>
+
+                        <div class="border rounded-xl p-6">
+                            <h5 class="font-bold text-industrial-orange mb-2">4. Hostinger Setup</h5>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>Login to hPanel</li>
+                                <li>Go to <strong>Database → MySQL Databases</strong></li>
+                                <li>Create new database and user</li>
+                                <li>Open <strong>phpMyAdmin</strong> from dashboard</li>
+                                <li>Import the SQL schema</li>
+                                <li>Use File Manager or FTP to upload files to <code>public_html</code></li>
+                            </ul>
+                        </div>
+
+                        <div class="border rounded-xl p-6">
+                            <h5 class="font-bold text-industrial-orange mb-2">5. API Endpoints (PHP Examples)</h5>
+                            <pre class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm"><code>// api/products.php - Get all products
+&lt;?php
+header('Content-Type: application/json');
+require_once 'config.php';
+
+$stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC");
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+echo json_encode($products);
+?&gt;
+
+// api/add_product.php - Add product
+&lt;?php
+header('Content-Type: application/json');
+require_once 'config.php';
+
+$data = json_decode(file_get_contents('php://input'), true);
+$stmt = $pdo->prepare("INSERT INTO products (name, category, price, description, specifications, images) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->execute([$data['name'], $data['category'], $data['price'], $data['description'], $data['specifications'], json_encode($data['images'])]);
+echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
+?&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
+                    <h3 class="text-xl font-bold text-green-800 mb-2">Running the Program</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li><strong>Local Testing:</strong> Simply open the HTML file in any modern browser</li>
+                        <li><strong>With Database:</strong> Install XAMPP/WAMP, place files in <code>htdocs</code>, start Apache & MySQL</li>
+                        <li><strong>Production:</strong> Upload to hosting provider's <code>public_html</code> folder</li>
+                        <li><strong>Admin Access:</strong> Default login - Username: <code>admin</code>, Password: <code>admin</code></li>
+                    </ol>
+                </div>
+
+                <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-500">
+                    <h3 class="text-xl font-bold text-red-800 mb-2">Important Notes</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Change default admin password immediately after first login</li>
+                        <li>For production, implement proper password hashing (bcrypt)</li>
+                        <li>Enable HTTPS/SSL certificate on your domain</li>
+                        <li>Regular backup of database recommended</li>
+                        <li>Current version uses client-side storage (IndexedDB) - data is browser-specific</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database Management
+        const DB_NAME = 'PraniraIndustriesDB';
+        const DB_VERSION = 1;
+        let db;
+
+        // Initialize Database
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    if (!db.objectStoreNames.contains('products')) {
+                        const productStore = db.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
+                        productStore.createIndex('category', 'category', { unique: false });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('gallery')) {
+                        db.createObjectStore('gallery', { keyPath: 'id', autoIncrement: true });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('videos')) {
+                        db.createObjectStore('videos', { keyPath: 'id', autoIncrement: true });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('enquiries')) {
+                        db.createObjectStore('enquiries', { keyPath: 'id', autoIncrement: true });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('tickets')) {
+                        const ticketStore = db.createObjectStore('tickets', { keyPath: 'id', autoIncrement: true });
+                        ticketStore.createIndex('status', 'status', { unique: false });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('settings')) {
+                        db.createObjectStore('settings', { keyPath: 'key' });
+                    }
+                };
+            });
+        }
+
+        // Data Operations
+        const DB = {
+            async getAll(storeName) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            
+            async add(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.add(data);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            
+            async put(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.put(data);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            
+            async delete(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.delete(id);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+            },
+            
+            async get(storeName, id) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([storeName], 'readonly');
+                    const store = transaction.objectStore(storeName);
+                    const request = store.get(id);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+        };
+
+        // State Management
+        let currentLang = 'en';
+        let currentProduct = null;
+        let currentSlide = 0;
+        let adminLoggedIn = false;
+
+        // Initialize
+        window.onload = async function() {
+            await initDB();
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2500);
+            
+            loadInitialData();
+            updateDashboard();
+        };
+
+        // Load Initial Data
+        async function loadInitialData() {
+            // Check if products exist, if not add defaults
+            const products = await DB.getAll('products');
+            if (products.length === 0) {
+                await addDefaultProducts();
+            }
+            renderProducts();
+            renderFeaturedProducts();
+            renderGallery();
+            renderVideos();
+        }
+
+        // Default Products
+        async function addDefaultProducts() {
+            const defaultProducts = [
+                {
+                    name: 'ACE Diesel Forklift 3 Ton',
+                    category: 'forklift',
+                    price: '₹4,50,000',
+                    description: 'Heavy-duty diesel forklift with excellent lifting capacity and fuel efficiency. Ideal for outdoor operations and heavy loads.',
+                    specifications: ['Capacity: 3 Ton', 'Lift Height: 3000mm', 'Fuel: Diesel', 'Engine: Japanese Technology'],
+                    images: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800']
+                },
+                {
+                    name: 'ACE Electric Forklift 1.5T',
+                    category: 'forklift',
+                    price: '₹3,20,000',
+                    description: 'Zero-emission electric forklift perfect for indoor warehouse operations. Quiet and efficient.',
+                    specifications: ['Capacity: 1.5 Ton', 'Battery: 48V', 'Lift Height: 3000mm', 'Charging Time: 8 hours'],
+                    images: ['https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800']
+                },
+                {
+                    name: 'ACE Hand Pallet Truck',
+                    category: 'pallet',
+                    price: '₹15,000',
+                    description: 'Manual pallet truck for easy movement of goods in warehouses. Heavy-duty hydraulic pump.',
+                    specifications: ['Capacity: 2.5 Ton', 'Fork Length: 1150mm', 'Width: 550mm', 'Polyurethane Wheels'],
+                    images: ['https://images.unsplash.com/photo-1553413077-190dd305871c?w=800']
+                },
+                {
+                    name: 'ACE Reach Truck',
+                    category: 'forklift',
+                    price: '₹5,80,000',
+                    description: 'High-reach forklift for narrow aisle warehouses. Excellent maneuverability.',
+                    specifications: ['Capacity: 1.5 Ton', 'Lift Height: 6000mm', 'Battery Operated', 'Side Shift'],
+                    images: ['https://images.unsplash.com/photo-1605218427368-35b0f996d2e6?w=800']
+                },
+                {
+                    name: 'ACE Electrical Stacker',
+                    category: 'stacker',
+                    price: '₹1,85,000',
+                    description: 'Semi-electric stacker for medium-duty stacking operations. Easy to operate.',
+                    specifications: ['Capacity: 1.5 Ton', 'Lift Height: 3500mm', 'Semi-Electric', 'Straddle Legs'],
+                    images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800']
+                },
+                {
+                    name: 'ACE Boom Lift',
+                    category: 'other',
+                    price: '₹12,50,000',
+                    description: 'Aerial work platform for maintenance and construction work. Safe and stable.',
+                    specifications: ['Platform Height: 12m', 'Capacity: 200kg', 'Diesel/Electric', '4WD Available'],
+                    images: ['https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800']
+                }
+            ];
+
+            for (let product of defaultProducts) {
+                await DB.add('products', product);
+            }
+        }
+
+        // Language Management
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute(`data-${lang}`);
+            });
+            
+            document.getElementById('btn-en').className = lang === 'en' ? 'lang-switch text-xs font-bold px-2 py-1 rounded bg-industrial-orange text-white' : 'lang-switch text-xs font-bold px-2 py-1 rounded text-gray-400 hover:text-white';
+            document.getElementById('btn-hi').className = lang === 'hi' ? 'lang-switch text-xs font-bold px-2 py-1 rounded bg-industrial-orange text-white' : 'lang-switch text-xs font-bold px-2 py-1 rounded text-gray-400 hover:text-white';
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('active');
+        }
+
+        // Product Functions
+        async function renderProducts(filter = 'all') {
+            const products = await DB.getAll('products');
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+            
+            filtered.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card rounded-xl overflow-hidden cursor-pointer';
+                card.onclick = () => openProductDetail(product.id);
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden">
+                        <img src="${product.images[0]}" alt="${product.name}" class="w-full h-full object-cover hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-industrial-dark mb-2">${product.name}</h3>
+                        <p class="text-industrial-orange font-bold text-lg mb-2">${product.price}</p>
+                        <p class="text-gray-600 text-sm line-clamp-2">${product.description}</p>
+                        <button class="mt-4 w-full bg-industrial-dark text-white py-2 rounded-lg hover:bg-industrial-orange transition">View Details</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterProducts(category) {
+            renderProducts(category);
+        }
+
+        async function renderFeaturedProducts() {
+            const products = await DB.getAll('products');
+            const featured = products.slice(0, 3);
+            const container = document.getElementById('featuredProducts');
+            container.innerHTML = '';
+            
+            featured.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition';
+                card.innerHTML = `
+                    <div class="h-56 overflow-hidden">
+                        <img src="${product.images[0]}" alt="${product.name}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-industrial-dark mb-2">${product.name}</h3>
+                        <p class="text-industrial-orange font-bold mb-3">${product.price}</p>
+                        <button onclick="openProductDetail(${product.id})" class="w-full bg-industrial-orange text-white py-2 rounded-lg hover:bg-yellow-600 transition">View Details</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function openProductDetail(productId) {
+            const product = await DB.get('products', productId);
+            if (!product) return;
+            
+            currentProduct = product;
+            document.getElementById('modalProductName').textContent = product.name;
+            document.getElementById('modalProductPrice').textContent = product.price;
+            document.getElementById('modalProductDesc').textContent = product.description;
+            
+            // Specs
+            const specsList = document.getElementById('modalProductSpecs');
+            specsList.innerHTML = '';
+            if (product.specifications) {
+                product.specifications.forEach(spec => {
+                    specsList.innerHTML += `<li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>${spec}</li>`;
+                });
+            }
+            
+            // Images
+            const track = document.getElementById('sliderTrack');
+            const thumbs = document.getElementById('thumbnailContainer');
+            track.innerHTML = '';
+            thumbs.innerHTML = '';
+            
+            product.images.forEach((img, idx) => {
+                track.innerHTML += `<img src="${img}" class="slider-image" alt="">`;
+                thumbs.innerHTML += `<img src="${img}" class="w-20 h-20 object-cover rounded cursor-pointer border-2 ${idx === 0 ? 'border-industrial-orange' : 'border-transparent'}" onclick="goToSlide(${idx})">`;
+            });
+            
+            currentSlide = 0;
+            updateSlider();
+            
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        function nextSlide() {
+            const product = currentProduct;
+            if (!product) return;
+            currentSlide = (currentSlide + 1) % product.images.length;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            const product = currentProduct;
+            if (!product) return;
+            currentSlide = (currentSlide - 1 + product.images.length) % product.images.length;
+            updateSlider();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+        }
+
+        function updateSlider() {
+            const track = document.getElementById('sliderTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Update thumbnails
+            const thumbs = document.querySelectorAll('#thumbnailContainer img');
+            thumbs.forEach((thumb, idx) => {
+                thumb.className = `w-20 h-20 object-cover rounded cursor-pointer border-2 ${idx === currentSlide ? 'border-industrial-orange' : 'border-transparent'}`;
+            });
+        }
+
+        function enquiryForProduct() {
+            if (currentProduct) {
+                document.getElementById('enqProduct').value = currentProduct.name;
+                closeProductModal();
+                showSection('enquiry');
+            }
+        }
+
+        // Gallery Functions
+        async function renderGallery() {
+            const images = await DB.getAll('gallery');
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+            
+            // Add default images if empty
+            if (images.length === 0) {
+                const defaults = [
+                    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800',
+                    'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800',
+                    'https://images.unsplash.com/photo-1553413077-190dd305871c?w=800',
+                    'https://images.unsplash.com/photo-1605218427368-35b0f996d2e6?w=800'
+                ];
+                for (let url of defaults) {
+                    await DB.add('gallery', { url, title: 'Equipment' });
+                }
+                return renderGallery();
+            }
+            
+            images.forEach(img => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `<img src="${img.url}" alt="${img.title}" onclick="window.open('${img.url}', '_blank')">`;
+                grid.appendChild(item);
+            });
+        }
+
+        // Video Functions
+        async function renderVideos() {
+            const videos = await DB.getAll('videos');
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '';
+            
+            if (videos.length === 0) {
+                grid.innerHTML = '<p class="text-gray-500 col-span-3 text-center">No videos available</p>';
+                return;
+            }
+            
+            videos.forEach(video => {
+                const videoId = extractYouTubeId(video.url);
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg overflow-hidden';
+                card.innerHTML = `
+                    <div class="aspect-video bg-gray-900 flex items-center justify-center relative group cursor-pointer" onclick="window.open('https://youtube.com/watch?v=${videoId}', '_blank')">
+                        <img src="https://img.youtube.com/vi/${videoId}/0.jpg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white text-2xl group-hover:scale-110 transition">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-industrial-dark">${video.title}</h3>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
+        // Form Submissions
+        document.getElementById('enquiryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('enqName').value,
+                company: document.getElementById('enqCompany').value,
+                email: document.getElementById('enqEmail').value,
+                phone: document.getElementById('enqPhone').value,
+                product: document.getElementById('enqProduct').value,
+                message: document.getElementById('enqMessage').value,
+                date: new Date().toISOString()
+            };
+            
+            await DB.add('enquiries', data);
+            
+            // WhatsApp Integration
+            const text = `New Enquiry from ${data.name}%0ACompany: ${data.company}%0APhone: ${data.phone}%0AProduct: ${data.product}%0AMessage: ${data.message}`;
+            window.open(`https://wa.me/919028287014?text=${text}`, '_blank');
+            
+            alert('Enquiry submitted successfully! Opening WhatsApp...');
+            this.reset();
+            updateDashboard();
+        });
+
+        document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const ticketNum = 'TKT-' + Date.now().toString().slice(-6);
+            const data = {
+                ticketNumber: ticketNum,
+                name: document.getElementById('svcName').value,
+                phone: document.getElementById('svcPhone').value,
+                model: document.getElementById('svcModel').value,
+                serial: document.getElementById('svcSerial').value,
+                type: document.querySelector('input[name="svcType"]:checked').value,
+                issue: document.getElementById('svcIssue').value,
+                date: document.getElementById('svcDate').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            await DB.add('tickets', data);
+            
+            // WhatsApp notification
+            const text = `Service Ticket: ${ticketNum}%0ACustomer: ${data.name}%0APhone: ${data.phone}%0AIssue: ${data.issue}%0AType: ${data.type}`;
+            window.open(`https://wa.me/919028287014?text=${text}`, '_blank');
+            
+            alert(`Ticket ${ticketNum} raised successfully! We will contact you shortly.`);
+            this.reset();
+            updateDashboard();
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = `Contact Form Submission%0AName: ${document.getElementById('contactName').value}%0AEmail: ${document.getElementById('contactEmail').value}%0APhone: ${document.getElementById('contactPhone').value}%0AMessage: ${document.getElementById('contactMessage').value}`;
+            window.open(`https://wa.me/919028287014?text=${text}`, '_blank');
+            alert('Message sent! Opening WhatsApp...');
+            this.reset();
+        });
+
+        // Admin Functions
+        function showAdminLogin() {
+            document.getElementById('mainWebsite').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('adminLogin').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+        }
+
+        function backToWebsite() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('mainWebsite').classList.remove('hidden');
+            adminLoggedIn = false;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            
+            // Check stored credentials or use default
+            const settings = await DB.get('settings', 'credentials');
+            const validUser = settings ? settings.username : 'admin';
+            const validPass = settings ? settings.password : 'admin';
+            
+            if (user === validUser && pass === validPass) {
+                adminLoggedIn = true;
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+                updateAdminDashboard();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function adminLogout() {
+            adminLoggedIn = false;
+            backToWebsite();
+        }
+
+        function showAdminSection(section) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`admin-${section}`).classList.remove('hidden');
+            
+            if (section === 'products') renderAdminProducts();
+            if (section === 'gallery') renderAdminGallery();
+            if (section === 'videos') renderAdminVideos();
+            if (section === 'enquiries') renderEnquiries();
+            if (section === 'tickets') renderTickets();
+        }
+
+        async function updateAdminDashboard() {
+            const products = await DB.getAll('products');
+            const enquiries = await DB.getAll('enquiries');
+            const tickets = await DB.getAll('tickets');
+            const gallery = await DB.getAll('gallery');
+            
+            document.getElementById('dashProductCount').textContent = products.length;
+            document.getElementById('dashEnquiryCount').textContent = enquiries.length;
+            document.getElementById('dashTicketCount').textContent = tickets.filter(t => t.status !== 'resolved').length;
+            document.getElementById('dashGalleryCount').textContent = gallery.length;
+            
+            // Recent items
+            const recentEnq = enquiries.slice(-5).reverse();
+            const recentTkt = tickets.slice(-5).reverse();
+            
+            document.getElementById('recentEnquiries').innerHTML = recentEnq.map(e => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <div>
+                        <div class="font-medium">${e.name}</div>
+                        <div class="text-xs text-gray-500">${e.product || 'General'}</div>
+                    </div>
+                    <div class="text-xs text-gray-400">${new Date(e.date).toLocaleDateString()}</div>
+                </div>
+            `).join('') || '<p class="text-gray-400 text-sm">No recent enquiries</p>';
+            
+            document.getElementById('recentTickets').innerHTML = recentTkt.map(t => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <div>
+                        <div class="font-medium">${t.ticketNumber}</div>
+                        <div class="text-xs text-gray-500">${t.name}</div>
+                    </div>
+                    <span class="px-2 py-1 rounded text-xs ${t.status === 'pending' ? 'status-pending' : t.status === 'in-progress' ? 'status-progress' : 'status-resolved'}">${t.status}</span>
+                </div>
+            `).join('') || '<p class="text-gray-400 text-sm">No recent tickets</p>';
+        }
+
+        // Product Management
+        async function renderAdminProducts() {
+            const products = await DB.getAll('products');
+            const tbody = document.getElementById('adminProductsTable');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4"><img src="${product.images[0]}" class="w-16 h-16 object-cover rounded"></td>
+                    <td class="px-6 py-4 font-medium">${product.name}</td>
+                    <td class="px-6 py-4 capitalize">${product.category}</td>
+                    <td class="px-6 py-4">${product.price}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="editProduct(${product.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteProduct(${product.id})" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openProductModal() {
+            document.getElementById('productEditModal').classList.remove('hidden');
+            document.getElementById('productEditModal').classList.add('flex');
+            document.getElementById('productForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productModalTitle').textContent = 'Add Product';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+        }
+
+        function closeProductEditModal() {
+            document.getElementById('productEditModal').classList.add('hidden');
+            document.getElementById('productEditModal').classList.remove('flex');
+        }
+
+        let tempImages = [];
+
+        function handleImagePreview(input) {
+            tempImages = [];
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                Array.from(input.files).slice(0, 4).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempImages.push(e.target.result);
+                        container.innerHTML += `<img src="${e.target.result}" class="w-full h-24 object-cover rounded">`;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editProductId').value;
+            const productData = {
+                name: document.getElementById('prodName').value,
+                category: document.getElementById('prodCategory').value,
+                price: document.getElementById('prodPrice').value,
+                description: document.getElementById('prodDesc').value,
+                specifications: document.getElementById('prodSpecs').value.split('\n').filter(s => s.trim()),
+                images: tempImages.length > 0 ? tempImages : ['https://via.placeholder.com/400x300?text=No+Image']
+            };
+            
+            if (id) {
+                productData.id = parseInt(id);
+                await DB.put('products', productData);
+            } else {
+                await DB.add('products', productData);
+            }
+            
+            closeProductEditModal();
+            renderAdminProducts();
+            renderProducts();
+            renderFeaturedProducts();
+            updateDashboard();
+        });
+
+        async function editProduct(id) {
+            const product = await DB.get('products', id);
+            if (!product) return;
+            
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('prodName').value = product.name;
+            document.getElementById('prodCategory').value = product.category;
+            document.getElementById('prodPrice').value = product.price;
+            document.getElementById('prodDesc').value = product.description;
+            document.getElementById('prodSpecs').value = product.specifications.join('\n');
+            
+            tempImages = product.images;
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            product.images.forEach(img => {
+                container.innerHTML += `<img src="${img}" class="w-full h-24 object-cover rounded">`;
+            });
+            
+            document.getElementById('productModalTitle').textContent = 'Edit Product';
+            document.getElementById('productEditModal').classList.remove('hidden');
+            document.getElementById('productEditModal').classList.add('flex');
+        }
+
+        async function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                await DB.delete('products', id);
+                renderAdminProducts();
+                renderProducts();
+                renderFeaturedProducts();
+                updateDashboard();
+            }
+        }
+
+        // Gallery Management
+        async function renderAdminGallery() {
+            const images = await DB.getAll('gallery');
+            const grid = document.getElementById('adminGalleryGrid');
+            grid.innerHTML = '';
+            
+            images.forEach(img => {
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                div.innerHTML = `
+                    <img src="${img.url}" class="w-full h-32 object-cover rounded-lg">
+                    <button onclick="deleteGalleryImage(${img.id})" class="absolute top-2 right-2 w-8 h-8 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        async function uploadGalleryImages(input) {
+            if (input.files) {
+                for (let file of input.files) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        await DB.add('gallery', { url: e.target.result, title: file.name });
+                        renderAdminGallery();
+                        renderGallery();
+                        updateDashboard();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        async function deleteGalleryImage(id) {
+            if (confirm('Delete this image?')) {
+                await DB.delete('gallery', id);
+                renderAdminGallery();
+                renderGallery();
+                updateDashboard();
+            }
+        }
+
+        // Video Management
+        async function renderAdminVideos() {
+            const videos = await DB.getAll('videos');
+            const grid = document.getElementById('adminVideoGrid');
+            grid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoId = extractYouTubeId(video.url);
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg shadow overflow-hidden relative group';
+                div.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-medium truncate">${video.title}</h4>
+                    </div>
+                    <button onclick="deleteVideo(${video.id})" class="absolute top-2 right-2 w-8 h-8 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function openVideoModal() {
+            document.getElementById('videoModal').classList.remove('hidden');
+            document.getElementById('videoModal').classList.add('flex');
+            document.getElementById('videoForm').reset();
+        }
+
+        function closeVideoModal() {
+            document.getElementById('videoModal').classList.add('hidden');
+            document.getElementById('videoModal').classList.remove('flex');
+        }
+
+        document.getElementById('videoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('videoTitle').value,
+                url: document.getElementById('videoUrl').value
+            };
+            await DB.add('videos', data);
+            closeVideoModal();
+            renderAdminVideos();
+            renderVideos();
+        });
+
+        async function deleteVideo(id) {
+            if (confirm('Delete this video?')) {
+                await DB.delete('videos', id);
+                renderAdminVideos();
+                renderVideos();
+            }
+        }
+
+        // Enquiries & Tickets Admin
+        async function renderEnquiries() {
+            const enquiries = await DB.getAll('enquiries');
+            const tbody = document.getElementById('enquiriesTable');
+            tbody.innerHTML = '';
+            
+            enquiries.reverse().forEach(e => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm">${new Date(e.date).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 font-medium">${e.name}</td>
+                    <td class="px-6 py-4">${e.phone}</td>
+                    <td class="px-6 py-4">${e.product || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">${e.message}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function renderTickets() {
+            const tickets = await DB.getAll('tickets');
+            const tbody = document.getElementById('ticketsTable');
+            tbody.innerHTML = '';
+            
+            tickets.reverse().forEach(t => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium">${t.ticketNumber}</td>
+                    <td class="px-6 py-4 text-sm">${new Date(t.createdAt).toLocaleDateString()}</td>
+                    <td class="px-6 py-4">${t.name}</td>
+                    <td class="px-6 py-4 capitalize">${t.type}</td>
+                    <td class="px-6 py-4">
+                        <select onchange="updateTicketStatus(${t.id}, this.value)" class="text-sm border rounded px-2 py-1 ${t.status === 'pending' ? 'status-pending' : t.status === 'in-progress' ? 'status-progress' : 'status-resolved'}">
+                            <option value="pending" ${t.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="in-progress" ${t.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="resolved" ${t.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="viewTicket(${t.id})" class="text-blue-600 hover:text-blue-800"><i class="fas fa-eye"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function updateTicketStatus(id, status) {
+            const ticket = await DB.get('tickets', id);
+            if (ticket) {
+                ticket.status = status;
+                await DB.put('tickets', ticket);
+                renderTickets();
+                updateDashboard();
+                
+                // Send WhatsApp update
+                const text = `Ticket Update: ${ticket.ticketNumber}%0AStatus: ${status.toUpperCase()}%0AOur team is working on your request.`;
+                window.open(`https://wa.me/91${ticket.phone}?text=${text}`, '_blank');
+            }
+        }
+
+        function viewTicket(id) {
+            // Implement ticket detail view if needed
+        }
+
+        // Download Reports
+        async function downloadEnquiriesExcel() {
+            const enquiries = await DB.getAll('enquiries');
+            const data = enquiries.map(e => ({
+                Date: new Date(e.date).toLocaleDateString(),
+                Name: e.name,
+                Company: e.company,
+                Email: e.email,
+                Phone: e.phone,
+                Product: e.product,
+                Message: e.message
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Enquiries');
+            XLSX.writeFile(wb, 'Enquiries_Report.xlsx');
+        }
+
+        async function downloadEnquiriesPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const enquiries = await DB.getAll('enquiries');
+            
+            doc.text('Pranira Industries - Enquiries Report', 14, 20);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+            
+            const data = enquiries.map(e => [
+                new Date(e.date).toLocaleDateString(),
+                e.name,
+                e.phone,
+                e.product || '-',
+                e.message.substring(0, 50) + '...'
+            ]);
+            
+            doc.autoTable({
+                startY: 40,
+                head: [['Date', 'Name', 'Phone', 'Product', 'Message']],
+                body: data
+            });
+            
+            doc.save('Enquiries_Report.pdf');
+        }
+
+        async function downloadTicketsExcel() {
+            const tickets = await DB.getAll('tickets');
+            const data = tickets.map(t => ({
+                'Ticket #': t.ticketNumber,
+                Date: new Date(t.createdAt).toLocaleDateString(),
+                Customer: t.name,
+                Phone: t.phone,
+                Type: t.type,
+                Status: t.status,
+                Issue: t.issue
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Tickets');
+            XLSX.writeFile(wb, 'Service_Tickets_Report.xlsx');
+        }
+
+        async function downloadTicketsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const tickets = await DB.getAll('tickets');
+            
+            doc.text('Pranira Industries - Service Tickets Report', 14, 20);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+            
+            const data = tickets.map(t => [
+                t.ticketNumber,
+                new Date(t.createdAt).toLocaleDateString(),
+                t.name,
+                t.type,
+                t.status,
+                t.issue.substring(0, 40) + '...'
+            ]);
+            
+            doc.autoTable({
+                startY: 40,
+                head: [['Ticket #', 'Date', 'Customer', 'Type', 'Status', 'Issue']],
+                body: data
+            });
+            
+            doc.save('Service_Tickets_Report.pdf');
+        }
+
+        // Settings
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const current = document.getElementById('currentPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const confirm = document.getElementById('confirmPass').value;
+            
+            const settings = await DB.get('settings', 'credentials') || { username: 'admin', password: 'admin' };
+            
+            if (current !== settings.password) {
+                alert('Current password is incorrect!');
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                alert('New passwords do not match!');
+                return;
+            }
+            
+            await DB.put('settings', { key: 'credentials', username: 'admin', password: newPass });
+            alert('Password updated successfully!');
+            this.reset();
+        });
+
+        function previewLogo(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('currentLogo').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-contain">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateDashboard() {
+            if (adminLoggedIn) {
+                updateAdminDashboard();
+            }
+        }
+
+        // Auto-show guide on first load (optional)
+        if (!localStorage.getItem('guideShown')) {
+            setTimeout(() => {
+                document.getElementById('hostingGuide').classList.remove('hidden');
+                document.getElementById('hostingGuide').classList.add('flex');
+                document.getElementById('hostingGuide').style.display = 'flex';
+                localStorage.setItem('guideShown', 'true');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
